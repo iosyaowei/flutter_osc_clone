@@ -5,12 +5,10 @@ class _DrawSliderItem extends StatelessWidget {
   const _DrawSliderItem({
     @required this.iconPath, 
     @required this.title,
-    this.onPressed
   });
   
   final String iconPath;
   final String title;
-  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +48,6 @@ class _DrawSliderItem extends StatelessWidget {
     );
   }
 }
-
 
 class DrawSlidePage extends StatelessWidget {
 
@@ -98,14 +95,21 @@ class DrawSlidePage extends StatelessWidget {
       );
     }else {
       index -= 1;
-      return _DrawSliderItem(
-        iconPath: menuIcons[index],
-        title: menuTitles[index],
-        onPressed: () {
-
+      return InkWell(
+        child:  _DrawSliderItem(
+          iconPath: menuIcons[index],
+          title: menuTitles[index],
+        ),
+        onTap: (){
+          switch (index) {
+            case 0://发布动弹
+              print('发布动弹');
+              break;
+            default:
+              print('哈哈哈');
+          }
         },
       );
     }
   }
-
 }
