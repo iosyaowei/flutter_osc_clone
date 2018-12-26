@@ -1,35 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_osc_clone/constants/Constants.dart' show AppColors, AppSizes;
 
 class _DrawSliderItem extends StatelessWidget {
   const _DrawSliderItem({
     @required this.iconPath, 
-    @required this.title
+    @required this.title,
+    this.onPressed
   });
   
   final String iconPath;
   final String title;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Color(AppColors.DividerColor),
+            width: AppSizes.DividerWidth,
+          )
+        )
+      ),
+      child: Row(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.fromLTRB(15.0, 15.0, 10.0, 15.0),
+            child: Image.asset(
+              this.iconPath,
+              width:28.0,
+              height: 28.0
+            ),
+          ),
+          Expanded(
+            child: Text(
+              this.title, 
+              style: TextStyle(fontSize: 15.0), 
+            ),
+          ), 
+          Image.asset(
+            'assets/images/ic_arrow_right.png',
+            width: 16.0,
+            height: 16.0,
+          ),
+          SizedBox(width: 10.0),
+        ],
+      ),
     );
   }
 }
 
 
 class DrawSlidePage extends StatelessWidget {
-  // 图标文本前面的图标大小
-  static const double IMGAGE_ICON_WIDTH = 30.0;
-
-  //菜单后面的箭头的图标大小
-  static const double ARROW_ICON_WIDTH = 16.0;
-
-  var rightArrowIocn = Image.asset(
-    'assets/images/ic_arrow_right.png',
-    width: ARROW_ICON_WIDTH,
-    height: ARROW_ICON_WIDTH,
-  );
 
   List menuTitles = ['发布动弹', '动弹小黑屋', '关于', '设置'];
 
@@ -53,35 +76,35 @@ class DrawSlidePage extends StatelessWidget {
         elevation: 16.0,
         child: Container(
           decoration: BoxDecoration(
-            color: Color(0xFFFFFFFF)
+            color: Color(0xFFFFFFFF),
+          ),
+          child: ListView.builder(
+            itemCount: menuTitles.length + 1,
+            itemBuilder: renderRow,
           ),
         ),
       ),
       );
   }
 
-  Widget getIconImage(path) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(2.0, 2.0, 6.0, 0.0),
-      child: Image.asset(path, width:28.0, height:28.0),
-    );
-  }
-
   Widget renderRow(BuildContext context, int index) {
     if (index == 0) {
-      var img = Image.asset('./assets/images/conver_img.jpg', width: 304.0, height: 304.0);
+      var img = Image.asset('./assets/images/cover_img.jpg', width: 304.0, height: 304.0);
       return Container(
         height: 304.0, 
         width: 304.0, 
-        margin: EdgeInsets.only(bottom: 10.0),
+        margin: EdgeInsets.only(bottom: 0.0),
         child: img,
       );
     }else {
       index -= 1;
+      return _DrawSliderItem(
+        iconPath: menuIcons[index],
+        title: menuTitles[index],
+        onPressed: () {
 
-      
-
-
+        },
+      );
     }
   }
 

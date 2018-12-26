@@ -1,7 +1,7 @@
 import 'package:event_bus/event_bus.dart';
 
 class Constants {
-    static final String REDIRECT_URL = "http://yubo725.top/osc/osc.php";
+  static final String REDIRECT_URL = "http://yubo725.top/osc/osc.php";
 
   static final String LOGIN_URL = "https://www.oschina.net/action/oauth2/authorize?client_id=4rWcDXCNTV5gMWxtagxI&response_type=code&redirect_uri=" + REDIRECT_URL;
 
@@ -12,3 +12,12 @@ class Constants {
   static EventBus eventBus = new EventBus();
 
 }
+
+class AppColors {
+  static const DividerColor = 0xffd9d9d9;
+}
+
+class AppSizes {
+  static const DividerWidth = 0.5;
+}
+
