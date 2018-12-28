@@ -11,6 +11,8 @@ class Constants {
 
   static EventBus eventBus = new EventBus();
 
+  static final List<String> Methods = ['get', 'post'];
+
 }
 
 class AppColors {
