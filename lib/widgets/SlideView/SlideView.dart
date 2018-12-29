@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import './SlideViewIndicator.dart';
-import 'package:flutter_osc_clone/models/HomeDataInfo.dart';
+import 'package:flutter_osc_clone/models/news_list_page_model.dart';
 class SlideView extends StatefulWidget {
-  List<HomeSlideListInfo> slideList;
+  List<Slide> slideList;
   SlideViewIndicator slideViewIndicator;
 
   SlideView({
@@ -16,7 +16,7 @@ class SlideView extends StatefulWidget {
 
 class _SlideViewState extends State<SlideView> with SingleTickerProviderStateMixin{
   TabController tabController;
-  List<HomeSlideListInfo> slideList;
+  List<Slide> slideList;
 
   @override
   void initState() {
