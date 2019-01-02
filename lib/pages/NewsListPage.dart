@@ -60,30 +60,89 @@ class _NewListItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               Text(
-               '$newsInfo.commCount',
+                newsInfo.commCount.toString(),
                 style: TextStyle(
                   color: Color(0xFFB5BDC0),
                   fontSize: 12.0
                  ),
               ),
-              Image.asset('./assets/ic_comment.png', width:16.0, height:16.0),
+              Image.asset('./assets/images/ic_comment.png', width:16.0, height:16.0),
             ],
           ),
         )
       ],
     );
 
-    // var thumbImg = Container(
-    //   margin: EdgeInsets.all(10),
-    //   width: 60.0,
-    //   height: 60.0,
-    //   decoration: ,
-    // );
-
-
-    return Container(
-      
+    var thumbImg = Container(
+      margin: EdgeInsets.all(10),
+      width: 60.0,
+      height: 60.0,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFFECECEC),
+        image: DecorationImage(
+          image: ExactAssetImage('./assets/images/ic_img_default.jpg'),
+          fit: BoxFit.cover
+        ),
+        border: Border.all(
+          color: Color(0xFFECECEC),
+          width: 2.0
+        ),
+      ),
     );
+
+    if (this.newsInfo.thumb != null && this.newsInfo.thumb.length > 0) {
+      thumbImg = Container(
+        margin: EdgeInsets.all(10.0),
+        width: 60.0,
+        height: 60.0,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Color(0xFFECECEC),
+          image: DecorationImage(
+            image: NetworkImage(this.newsInfo.thumb),
+            fit: BoxFit.cover
+          ),
+          border: Border.all(
+            color: Color(0xFFECECEC),
+            width: 2.0,
+          )
+        ),
+      );
+    }
+
+    var row = Row(
+      children: <Widget>[
+        Expanded(
+          flex: 1,
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              children: <Widget>[
+                titleRow,
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                  child: timeRow,
+                )
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(6.0),
+          child: Container(
+            width: 100.0,
+            height: 80.0,
+            color: Color(0xFfECECEC),
+            child: Center(
+              child: thumbImg,
+            ),
+          ),
+        )
+      ],
+    );
+
+    return row;
   }
 }
 
@@ -120,25 +179,32 @@ class _NewsListPageState extends State<NewsListPage> {
         child: CircularProgressIndicator(),
       );
     }else {
-       return ListView.builder(
-        itemCount: 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return Container(
-              height: 180.0,
-              child: Stack(
-                children: <Widget>[
-                  slideView,
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    child: indicator,  
-                  ),
-                ],
-              ),
-            );
-          }
-        },
-      );
+      int count = pageModel.news.list.length + 1;
+      print('itemCount =====$count');
+
+      return ListView.builder(
+      itemCount: count,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          print('当前加载的index ===== $index');
+          return Container(
+            height: 180.0,
+            child: Stack(
+              children: <Widget>[
+                SlideView(slideList: pageModel.slide, slideViewIndicator: indicator),               Container(
+                  alignment: Alignment.bottomCenter,
+                  child: indicator,  
+                ),
+              ],
+            ),
+          );
+        }else {
+          print('当前加载的ListView-index ===== $index');
+          var newsItem = pageModel.news.list[index - 1];
+          return _NewListItem(newsInfo: newsItem);
+        }
+      },
+    );
     }
   }
 
@@ -151,6 +217,7 @@ class _NewsListPageState extends State<NewsListPage> {
         if (code == 0) {
           var msg = result.value['msg'];
           pageModel = NewsListPageModel.fromJson(msg);
+          print('一共有====' + pageModel.news.list.length.toString());
           setState(() {
              initSlider();
           });
