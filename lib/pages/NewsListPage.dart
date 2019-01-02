@@ -3,6 +3,8 @@ import 'package:flutter_osc_clone/utils/NetUtils.dart';
 import 'package:flutter_osc_clone/models/news_list_page_model.dart';
 import 'package:flutter_osc_clone/widgets/SlideView/SlideView.dart';
 import 'package:flutter_osc_clone/widgets/SlideView/SlideViewIndicator.dart';
+import '../widgets/CommonEndLine.dart';
+
 
 class _NewListItem extends StatelessWidget {
 
@@ -142,7 +144,17 @@ class _NewListItem extends StatelessWidget {
       ],
     );
 
-    return row;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 0.5,
+            color: Color(0xFF9E9E9E),
+          )
+        )
+      ),
+      child: row,
+    );
   }
 }
 
@@ -154,17 +166,37 @@ class NewsListPage extends StatefulWidget {
 
 class _NewsListPageState extends State<NewsListPage> {
   NewsListPageModel pageModel;
+  List<NewsListInfo> newsList;
+
   var curPage = 1;
   var listTotalSize = 0;
+  bool isShowNoMoreData = false;
   ScrollController _controller = ScrollController();
   SlideView slideView;
   SlideViewIndicator indicator;
-  
+
+  _NewsListPageState() {
+    _controller.addListener((){
+      var maxScroll = _controller.position.maxScrollExtent;
+      var pixels = _controller.position.pixels;
+      if (maxScroll == pixels && newsList.length < listTotalSize) {
+        //滑动到底部 获取下一页数据
+        this.curPage++;
+        this.getNewsList(true);
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    getNewsList();
+    getNewsList(false);
+  }
+
+  Future<Null> _pullToRefresh() async {
+    curPage = 1;
+    getNewsList(false);
+    return null;
   }
 
   initSlider() {
@@ -179,19 +211,16 @@ class _NewsListPageState extends State<NewsListPage> {
         child: CircularProgressIndicator(),
       );
     }else {
-      int count = pageModel.news.list.length + 1;
-      print('itemCount =====$count');
-
-      return ListView.builder(
-      itemCount: count,
+      Widget listView = ListView.builder(
+      itemCount: newsList.length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == 0) {
-          print('当前加载的index ===== $index');
           return Container(
             height: 180.0,
             child: Stack(
               children: <Widget>[
-                SlideView(slideList: pageModel.slide, slideViewIndicator: indicator),               Container(
+                slideView,              
+                Container(
                   alignment: Alignment.bottomCenter,
                   child: indicator,  
                 ),
@@ -199,27 +228,36 @@ class _NewsListPageState extends State<NewsListPage> {
             ),
           );
         }else {
-          print('当前加载的ListView-index ===== $index');
-          var newsItem = pageModel.news.list[index - 1];
+          var newsItem = newsList[index - 1];
           return _NewListItem(newsInfo: newsItem);
         }
       },
     );
+
+    return RefreshIndicator(child: listView, onRefresh: _pullToRefresh);
     }
   }
 
-  getNewsList() {
+  getNewsList(bool isLoadMore) {
     const url = 'http://osc.yubo725.top/news/list';
-    const params = {'pageIndex': 0, 'pageSize': 10};
+    Map<String, int> params = {'pageIndex': curPage, 'pageSize': 10};
     NetUtils.request(url, RequestMethod.get, params).then((result) {
       if (result.isSuccess) {
         int code = result.value['code'];
         if (code == 0) {
           var msg = result.value['msg'];
-          pageModel = NewsListPageModel.fromJson(msg);
-          print('一共有====' + pageModel.news.list.length.toString());
+
           setState(() {
-             initSlider();
+            this.pageModel = NewsListPageModel.fromJson(msg);
+            this.listTotalSize = this.pageModel.news.total;
+            if (!isLoadMore) {
+              newsList = pageModel.news.list;
+            } else {
+              newsList.addAll(this.pageModel.news.list);
+              this.isShowNoMoreData = newsList.length >= this.listTotalSize;
+            }
+
+            initSlider();
           });
         }
       }
